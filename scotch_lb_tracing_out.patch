@@ -1,0 +1,55 @@
+[1mdiff --git a/src/ck-ldb/ScotchLB.C b/src/ck-ldb/ScotchLB.C[m
+[1mindex ea2765b7a..a805826a5 100644[m
+[1m--- a/src/ck-ldb/ScotchLB.C[m
+[1m+++ b/src/ck-ldb/ScotchLB.C[m
+[36m@@ -13,6 +13,7 @@[m
+ [m
+ #include "ScotchLB.h"[m
+ #include "ckgraph.h"[m
+[32m+[m[32m#include <stdio.h>[m
+ #include <scotch.h>[m
+ [m
+ extern int quietModeRequested;[m
+[36m@@ -120,6 +121,30 @@[m [mvoid ScotchLB::work(LDStats *stats) {[m
+   verttab[i] = edgeNum;[m
+   CkAssert(edgeNum == edgenbr);[m
+ [m
+[32m+[m[32m  printf("edgeNum: %d\n", edgeNum);[m
+[32m+[m[32m  printf("ratio: %e\n", ratio);[m
+[32m+[m[32m  printf("byteRatio: %e\n", byteRatio);[m
+[32m+[m[32m  printf("baseval: %d\n", baseval);[m
+[32m+[m[32m  printf("vertnbr: %d\n", vertnbr);[m
+[32m+[m[32m  printf("edgenbr: %d\n", edgenbr);[m
+[32m+[m
+[32m+[m[32m  printf("verttab:\n");[m
+[32m+[m[32m  for(i = baseval; i <= vertnbr; ++i) {[m
+[32m+[m[32m    // I _think_ `SCOTCH_Num` should just be int_64[m
+[32m+[m[32m    printf("  %d : %d\n", i, verttab[i]);[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m  printf("edgetab:\n");[m
+[32m+[m[32m  for (i = 0; i < edgenbr; ++i)[m
+[32m+[m[32m  {[m
+[32m+[m[32m    printf("  %d : %d\n", i, edgetab[i]);[m
+[32m+[m[32m  }[m
+[32m+[m[32m  printf("edlotab:\n");[m
+[32m+[m[32m  for (i = 0; i < edgenbr; ++i)[m
+[32m+[m[32m  {[m
+[32m+[m[32m    printf("  %d : %d\n", i, edlotab[i]);[m
+[32m+[m[32m  }[m
+[32m+[m
+   SCOTCH_Graph graph;		// Graph to partition[m
+   SCOTCH_Strat strat;		// Strategy to achieve partitioning[m
+ [m
+[36m@@ -133,8 +158,11 @@[m [mvoid ScotchLB::work(LDStats *stats) {[m
+   SCOTCH_stratGraphMapBuild (&strat, SCOTCH_STRATBALANCE, parr->procs.size (), 0.01);[m
+   SCOTCH_Num *pemap = (SCOTCH_Num *)malloc(sizeof(SCOTCH_Num) * vertnbr);[m
+ [m
+[32m+[m[32m  printf("Starting graph partition...\n");[m
+[32m+[m
+   SCOTCH_graphPart(&graph, parr->procs.size(), &strat, pemap);[m
+ [m
+[32m+[m[32m  printf("... Completed graph partition\n");[m
+ [m
+   SCOTCH_graphExit (&graph);[m
+   SCOTCH_stratExit (&strat);[m
